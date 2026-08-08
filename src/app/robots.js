@@ -6,6 +6,6 @@ export default function robots() {
         },
 
         sitemap:
-            "https://centralbiomedicals.com/sitemap.xml",
+            "https://ozallecom.com/sitemap.xml",
     };
 }

@@ -11,7 +11,7 @@ export async function generateMetadata({ params }) {
 
     const description = `Buy ${productName} at best price in India. Trusted supplier, dealer and distributor of ${productName} for hospitals, laboratories, diagnostic centers, research institutes and healthcare facilities. Contact Central Biomedicals for latest quotation and product details.`;
 
-    const url = `https://centralbiomedicals.com/items/${slug}`;
+    const url = `https://ozallecom.com/items/${slug}`;
 
     return {
         title,

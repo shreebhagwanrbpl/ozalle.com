@@ -6,7 +6,7 @@ export async function generateMetadata({ params }) {
     .replace(/-/g, " ")
     .replace(/\b\w/g, (char) => char.toUpperCase());
 
-  const url = `https://centralbiomedical.com/${district}`;
+  const url = `https://ozalle.com/${district}`;
 
   return {
     title: `Biomedical & Diagnostic Equipment Supplier in ${districtName} | Central Biomedical`,

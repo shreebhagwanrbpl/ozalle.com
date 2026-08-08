@@ -69,7 +69,7 @@ export default function ProductDetails({ slug }) {
                     doc(
                         db,
                         "websites",
-                        "centralbiomedicals",
+                        "ozallecom",
                         "pages",
                         "products"
                     )
@@ -92,7 +92,7 @@ export default function ProductDetails({ slug }) {
                     collection(
                         db,
                         "websites",
-                        "centralbiomedicals",
+                        "ozallecom",
                         "pages",
                         "categoryproducts",
                         "categories"
@@ -193,7 +193,7 @@ export default function ProductDetails({ slug }) {
                 collection(
                     db,
                     "websitesQueries",
-                    "centralbiomedicals",
+                    "ozallecom",
                     "productQueries"
                 ),
                 {
@@ -559,7 +559,7 @@ ${product?.desc}
                                             onClick={handleWhatsapp}
                                             className="w-full text-left px-3 py-2 hover:bg-slate-100 rounded flex items-center gap-2"
                                         >
-                                            <FaWhatsapp className="text-green-600" />
+                                            <FaWhatsapp className="text-blue-600" />
                                             WhatsApp
                                         </button>
 

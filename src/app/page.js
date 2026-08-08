@@ -37,7 +37,7 @@ export default function HeroSection({ city }) {
           doc(
             db,
             "websites",
-            "centralbiomedicals",
+            "ozallecom",
             "pages",
             "services"
           )
@@ -65,7 +65,7 @@ export default function HeroSection({ city }) {
     const fetchHeroData = async () => {
       try {
         const snap = await getDoc(
-          doc(db, "websites", "centralbiomedicals", "pages", "home")
+          doc(db, "websites", "ozallecom", "pages", "home")
         );
 
         if (snap.exists()) {
@@ -301,8 +301,8 @@ export default function HeroSection({ city }) {
             {/* Floating Card Bottom */}
             <div className="absolute -bottom-5 right-10 hidden lg:flex items-center gap-4 rounded-2xl bg-white px-5 py-4 shadow-xl border border-cyan-100">
 
-              <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-green-100">
-                <BadgeCheck className="text-green-600" size={26} />
+              <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-blue-100">
+                <BadgeCheck className="text-blue-600" size={26} />
               </div>
 
               <div>
