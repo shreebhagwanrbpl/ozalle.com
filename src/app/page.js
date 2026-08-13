@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 
 import ServiceCard from "@/components/ServiceCard";
-import CBG from "../components/img/CBG.png";
+import IMG from "../components/img/img.png";
 
 
 export default function HeroSection({ city }) {
@@ -252,7 +252,7 @@ export default function HeroSection({ city }) {
             <div className="relative z-10 w-full max-w-[600px] overflow-hidden rounded-[35px] border border-cyan-100 bg-white p-4 shadow-[0_25px_60px_rgba(220,38,38,0.15)]">
 
               <Image
-                src={CBG}
+                src={IMG}
                 alt="Central Biomedical"
                 width={1200}
                 height={900}
@@ -432,56 +432,159 @@ export default function HeroSection({ city }) {
 
         </div>
       </section>
-      <section className="section-padding bg-white">
-        <div className="container-custom">
 
-          <div className="text-center">
 
-            <span className="inline-block rounded-full bg-cyan-100 px-4 py-2 text-sm font-semibold text-cyan-700">
+      <section className="relative overflow-hidden bg-slate-50 py-20 md:py-28">
+
+        {/* Background Decoration */}
+
+        <div className="pointer-events-none absolute -left-32 top-20 h-72 w-72 rounded-full bg-cyan-100/40 blur-3xl" />
+
+        <div className="pointer-events-none absolute -right-32 bottom-10 h-80 w-80 rounded-full bg-indigo-100/40 blur-3xl" />
+
+
+        <div className="container-custom relative">
+
+          {/* =====================================================
+        HEADER
+    ====================================================== */}
+
+          <div className="mx-auto max-w-3xl text-center">
+
+            <span className="inline-flex items-center gap-2 rounded-full border border-cyan-100 bg-cyan-50 px-4 py-2 text-sm font-bold text-cyan-700">
+
+              <span className="h-2 w-2 rounded-full bg-cyan-600" />
+
               Our Services
+
             </span>
 
-            <h2 className="mt-5 text-4xl font-bold text-slate-900">
-              Premium Biomedical Services
+
+            <h2 className="mt-6 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl md:text-5xl">
+
+              Premium Biomedical
+
+              <span className="block bg-gradient-to-r from-cyan-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                Services & Solutions
+              </span>
+
             </h2>
 
-            <p className="mt-5 max-w-2xl mx-auto text-lg leading-8 text-slate-600">
-              We provide innovative healthcare and biomedical
-              solutions tailored to modern diagnostics and
-              laboratory excellence.
+
+            <p className="mx-auto mt-5 max-w-2xl text-base leading-8 text-slate-600 sm:text-lg">
+
+              From advanced diagnostic equipment to laboratory
+              solutions and technical support, we deliver reliable
+              biomedical services built for modern healthcare.
+
             </p>
 
           </div>
 
-          <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-8 mt-16">
+
+          {/* =====================================================
+        SERVICE CARDS
+    ====================================================== */}
+
+          <div className="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
 
             {services.slice(0, 3).map((service, index) => (
-              <ServiceCard
-                key={index}
-                icon={icons[index]}
-                title={service.title}
-                description={service.desc}
-              />
+
+              <div
+                key={service.id || index}
+                className="group relative overflow-hidden rounded-[28px] border border-slate-200 bg-white p-7 shadow-[0_10px_40px_rgba(15,23,42,0.05)] transition-all duration-500 hover:-translate-y-2 hover:border-cyan-200 hover:shadow-[0_25px_70px_rgba(6,182,212,0.12)]"
+              >
+
+                {/* Card Glow */}
+
+                <div className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-cyan-100/50 opacity-0 blur-3xl transition duration-500 group-hover:opacity-100" />
+
+
+                {/* Service Number */}
+
+                <div className="absolute right-6 top-5 text-5xl font-black text-slate-100 transition duration-500 group-hover:text-cyan-50">
+                  {String(index + 1).padStart(2, "0")}
+                </div>
+
+
+                {/* Icon */}
+
+                <div className="relative flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-50 to-indigo-50 text-2xl shadow-sm transition-all duration-500 group-hover:scale-110 group-hover:from-cyan-600 group-hover:to-indigo-600 group-hover:text-white">
+
+                  {icons[index]}
+
+                </div>
+
+
+                {/* Content */}
+
+                <div className="relative">
+
+                  <h3 className="mt-7 text-xl font-bold text-slate-950 transition-colors duration-300 group-hover:text-cyan-700">
+
+                    {service.title}
+
+                  </h3>
+
+
+                  <p className="mt-4 line-clamp-3 text-sm leading-7 text-slate-600">
+
+                    {service.desc}
+
+                  </p>
+
+
+                  {/* Bottom Link */}
+
+                  <div className="mt-7 flex items-center justify-between border-t border-slate-100 pt-5">
+
+                    <span className="text-sm font-bold text-slate-800">
+                      Explore Service
+                    </span>
+
+                    <span className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-700 transition-all duration-300 group-hover:bg-cyan-600 group-hover:text-white">
+                      →
+                    </span>
+
+                  </div>
+
+                </div>
+
+              </div>
+
             ))}
 
           </div>
 
+
+          {/* =====================================================
+        VIEW ALL BUTTON
+    ====================================================== */}
+
           <div className="mt-12 text-center">
 
-            <Link href={makeLink("/services")}>
+            <Link
+              href={makeLink("/services")}
+              className="group inline-flex items-center gap-3 rounded-2xl bg-white-950 px-7 py-4 text-sm font-bold text-white shadow-xl shadow-white-900/10 transition-all duration-300 hover:-translate-y-1 hover:bg-white-700 hover:shadow-white-700/20"
+            >
 
-              <button className="rounded-xl bg-slate-900 px-8 py-4 font-semibold text-white transition hover:bg-cyan-700">
-
+              <span>
                 View All Services
+              </span>
 
-              </button>
+              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-white/10 transition-transform duration-300 group-hover:translate-x-1">
+                →
+              </span>
 
             </Link>
 
           </div>
 
         </div>
+
       </section>
+
+
       <section className="section-padding bg-gradient-to-b from-white to-cyan-50/30">
         <div className="container-custom">
 

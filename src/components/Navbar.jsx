@@ -1,18 +1,27 @@
 "use client";
 
 import Link from "next/link";
-import { Menu, X } from "lucide-react";
-import { useState } from "react";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
+import {
+  Menu,
+  X,
+  ChevronDown,
+  ArrowRight,
+  Phone,
+  Sparkles,
+} from "lucide-react";
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const pathname = usePathname();
+  const pathname = usePathname() || "/";
 
-  const pathParts = pathname
-    .split("/")
-    .filter(Boolean);
+  // =========================================================
+  // DISTRICT ROUTING
+  // =========================================================
+
+  const pathParts = pathname.split("/").filter(Boolean);
 
   const staticRoutes = [
     "about",
@@ -37,96 +46,302 @@ export default function Navbar() {
     return `/${district}${path}`;
   };
 
+  // =========================================================
+  // NAVIGATION
+  // =========================================================
+
   const navLinks = [
-    { name: "Home", path: "/" },
-    { name: "About", path: "/about" },
-    { name: "Services", path: "/services" },
-    { name: "Products", path: "/items" },
-    { name: "Contact", path: "/contact" },
+    {
+      name: "Home",
+      path: "/",
+    },
+    {
+      name: "About",
+      path: "/about",
+    },
+    {
+      name: "Services",
+      path: "/services",
+    },
+    {
+      name: "Products",
+      path: "/items",
+    },
+    {
+      name: "Contact",
+      path: "/contact",
+    },
   ];
 
+  // =========================================================
+  // ACTIVE LINK
+  // =========================================================
+
+  const isActive = (path) => {
+    const href = makeLink(path);
+
+    if (path === "/") {
+      return pathname === href;
+    }
+
+    return (
+      pathname === href ||
+      pathname.startsWith(`${href}/`)
+    );
+  };
+
+  // =========================================================
+  // CLOSE MOBILE MENU
+  // =========================================================
+
+  const closeMenu = () => {
+    setMenuOpen(false);
+  };
+
   return (
-    <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-xl border-b border-slate-200">
-      <div className="container-custom h-20 flex items-center justify-between">
+    <>
+      {/* =====================================================
+          NAVBAR
+      ====================================================== */}
 
-        {/* Logo */}
-        <Link href={makeLink("/")}>
-          <h1 className="text-xl md:text-2xl font-bold text-sky-700">
-            Central
-            <span className="text-slate-900">
-              {" "}Biomedicals
-            </span>
-          </h1>
-        </Link>
+      <header className="sticky top-0 z-50 w-full">
 
-        {/* Desktop Menu */}
-        <nav className="hidden lg:flex items-center gap-8 text-[15px] font-medium text-slate-700">
-          {navLinks.map((link) => (
+        {/* Glass Background */}
+
+        <div className="border-b border-slate-200/70 bg-white/90 shadow-[0_4px_30px_rgba(15,23,42,0.04)] backdrop-blur-2xl">
+
+          <div className="mx-auto flex h-[76px] max-w-7xl items-center justify-between px-5 sm:px-6 lg:px-8">
+
+            {/* =================================================
+                LOGO
+            ================================================== */}
+
             <Link
-              key={link.name}
-              href={makeLink(link.path)}
-              className="hover:text-sky-700 transition"
+              href={makeLink("/")}
+              onClick={closeMenu}
+              className="group flex items-center gap-3"
             >
-              {link.name}
-            </Link>
-          ))}
-        </nav>
 
-        {/* Desktop Button */}
-        <div className="hidden lg:block">
-          <Link href={makeLink("/contact")}>
-            <button className="primary-btn">
-              Get Quote
+              {/* Logo Icon */}
+
+              <div className="relative flex h-11 w-11 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-cyan-600 via-cyan-600 to-cyan-800 shadow-lg shadow-cyan-600/20 transition duration-300 group-hover:scale-105">
+
+                <div className="absolute inset-0 bg-white/10" />
+
+                <span className="relative text-lg font-black text-white">
+                  R
+                </span>
+
+              </div>
+
+              {/* Logo Text */}
+
+              <div className="leading-none">
+
+                <div className="text-[18px] font-black tracking-[-0.03em] text-cyan-950 sm:text-xl">
+                  Raj{" "}
+                  <span className="bg-gradient-to-r from-cyan-600 to-cyan-600 bg-clip-text text-transparent">
+                    Biosis
+                  </span>
+                </div>
+
+                <div className="mt-1 hidden text-[9px] font-semibold uppercase tracking-[0.18em] text-slate-400 sm:block">
+                  Biomedical & Healthcare Solutions
+                </div>
+
+              </div>
+
+            </Link>
+
+            {/* =================================================
+                DESKTOP NAV
+            ================================================== */}
+
+            <nav className="hidden items-center lg:flex">
+
+              <div className="flex items-center gap-1 rounded-full border border-slate-100 bg-slate-50/70 p-1.5">
+
+                {navLinks.map((link) => {
+                  const active = isActive(link.path);
+
+                  return (
+                    <Link
+                      key={link.name}
+                      href={makeLink(link.path)}
+                      className={`relative rounded-full px-4 py-2.5 text-sm font-semibold transition-all duration-300 ${active
+                        ? "bg-white text-indigo-700 shadow-sm"
+                        : "text-slate-600 hover:bg-white/80 hover:text-indigo-700"
+                        }`}
+                    >
+                      {link.name}
+
+                      {active && (
+                        <span className="absolute bottom-1 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-indigo-600" />
+                      )}
+                    </Link>
+                  );
+                })}
+
+              </div>
+
+            </nav>
+
+            {/* =================================================
+                RIGHT ACTIONS
+            ================================================== */}
+
+            <div className="hidden items-center gap-3 lg:flex">
+
+              {/* Contact / Phone */}
+
+              <Link
+                href={makeLink("/contact")}
+                className="group hidden xl:flex items-center gap-2 rounded-xl px-3 py-2 text-slate-600 transition hover:bg-indigo-50 hover:text-indigo-700"
+              >
+
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 transition group-hover:bg-indigo-100">
+                  <Phone size={15} />
+                </div>
+
+                <div className="text-left">
+
+                  <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">
+                    Need Help?
+                  </p>
+
+                  <p className="text-xs font-bold">
+                    Contact Us
+                  </p>
+
+                </div>
+
+              </Link>
+
+              {/* CTA */}
+
+              <Link
+                href={makeLink("/contact")}
+                className="group inline-flex items-center gap-2 rounded-xl bg-cyan-700 px-5 py-3 text-sm font-bold text-white shadow-lg shadow-slate-950/10 transition-all duration-300 hover:-translate-y-0.5 hover:bg-cyan-700 hover:shadow-cyan-600/20"
+              >
+
+                <span>
+                  Get Quote
+                </span>
+
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/10 transition group-hover:bg-white/20">
+                  <ArrowRight size={14} />
+                </span>
+
+              </Link>
+
+            </div>
+
+            {/* =================================================
+                MOBILE MENU BUTTON
+            ================================================== */}
+
+            <button
+              type="button"
+              aria-label={
+                menuOpen
+                  ? "Close menu"
+                  : "Open menu"
+              }
+              onClick={() =>
+                setMenuOpen((prev) => !prev)
+              }
+              className="flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-800 shadow-sm transition hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700 lg:hidden"
+            >
+              {menuOpen ? (
+                <X size={22} />
+              ) : (
+                <Menu size={22} />
+              )}
             </button>
-          </Link>
+
+          </div>
+
         </div>
 
-        {/* Mobile Menu Button */}
-        <button
-          onClick={() => setMenuOpen(!menuOpen)}
-          className="lg:hidden"
+        {/* =====================================================
+            MOBILE MENU
+        ====================================================== */}
+
+        <div
+          className={`overflow-hidden border-b border-slate-200 bg-white shadow-xl transition-all duration-300 lg:hidden ${menuOpen
+            ? "max-h-[600px] opacity-100"
+            : "max-h-0 opacity-0"
+            }`}
         >
-          {menuOpen ? (
-            <X size={28} />
-          ) : (
-            <Menu size={28} />
-          )}
-        </button>
-      </div>
 
-      {/* Mobile Menu */}
-      <div
-        className={`lg:hidden overflow-hidden transition-all duration-300 ${menuOpen
-          ? "max-h-[500px]"
-          : "max-h-0"
-          }`}
-      >
-        <div className="bg-white border-t border-slate-100 p-6">
+          <div className="mx-auto max-w-7xl px-5 pb-6 pt-4 sm:px-6">
 
-          <nav className="flex flex-col gap-5 text-slate-700 font-medium">
+            {/* Mobile Badge */}
 
-            {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                href={makeLink(link.path)}
-                onClick={() => setMenuOpen(false)}
-              >
-                {link.name}
-              </Link>
-            ))}
+            <div className="mb-4 flex items-center gap-2 rounded-xl bg-indigo-50 px-4 py-3 text-xs font-semibold text-indigo-700">
+
+              <Sparkles size={15} />
+
+              Advanced Biomedical Solutions
+
+            </div>
+
+            {/* Mobile Links */}
+
+            <nav className="flex flex-col gap-1">
+
+              {navLinks.map((link) => {
+                const active = isActive(link.path);
+
+                return (
+                  <Link
+                    key={link.name}
+                    href={makeLink(link.path)}
+                    onClick={closeMenu}
+                    className={`flex items-center justify-between rounded-xl px-4 py-3.5 text-sm font-semibold transition ${active
+                      ? "bg-indigo-50 text-indigo-700"
+                      : "text-slate-700 hover:bg-slate-50 hover:text-indigo-700"
+                      }`}
+                  >
+
+                    <span>
+                      {link.name}
+                    </span>
+
+                    <ArrowRight
+                      size={16}
+                      className={
+                        active
+                          ? "text-indigo-600"
+                          : "text-slate-300"
+                      }
+                    />
+
+                  </Link>
+                );
+              })}
+
+            </nav>
+
+            {/* Mobile CTA */}
 
             <Link
               href={makeLink("/contact")}
-              onClick={() => setMenuOpen(false)}
+              onClick={closeMenu}
+              className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-slate-950 px-5 py-3.5 text-sm font-bold text-white shadow-lg transition hover:bg-indigo-700"
             >
-              <button className="primary-btn mt-3 w-full">
-                Get Quote
-              </button>
+
+              Get a Quote
+
+              <ArrowRight size={17} />
+
             </Link>
 
-          </nav>
+          </div>
+
         </div>
-      </div>
-    </header>
+
+      </header>
+    </>
   );
 }

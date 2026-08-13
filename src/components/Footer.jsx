@@ -9,20 +9,23 @@ import {
   Mail,
   Phone,
   MapPin,
+  ArrowRight,
 } from "lucide-react";
 
 export default function Footer() {
-  const [contactInfo, setContactInfo] =
-    useState([]);
+  const [contactInfo, setContactInfo] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [districtData, setDistrictData] =
-    useState(null);
+  const [districtData, setDistrictData] = useState(null);
 
   const pathname = usePathname();
 
+  // =========================================================
+  // GET DISTRICT FROM URL
+  // =========================================================
+
   const pathParts = pathname
-    .split("/")
-    .filter(Boolean);
+    ? pathname.split("/").filter(Boolean)
+    : [];
 
   const staticRoutes = [
     "about",
@@ -38,6 +41,10 @@ export default function Footer() {
       ? pathParts[0]
       : "";
 
+  // =========================================================
+  // LOAD CONTACT INFORMATION
+  // =========================================================
+
   useEffect(() => {
     const loadContact = async () => {
       try {
@@ -52,14 +59,41 @@ export default function Footer() {
         );
 
         if (snap.exists()) {
+          const data = snap.data();
+
+          console.log("CONTACT FIREBASE DATA:", data);
+
+          /*
+            contactInfo expected example:
+
+            contactInfo: [
+              {
+                label: "Phone Number",
+                value: "9876543210"
+              },
+              {
+                label: "Email Address",
+                value: "info@example.com"
+              },
+              {
+                label: "Office Address",
+                value: "Jaipur, Rajasthan"
+              }
+            ]
+          */
+
           setContactInfo(
-            snap.data().contactInfo || []
+            Array.isArray(data.contactInfo)
+              ? data.contactInfo
+              : []
           );
         }
-
-        setLoading(false);
-      } catch (err) {
-        console.log(err);
+      } catch (error) {
+        console.error(
+          "Error loading contact information:",
+          error
+        );
+      } finally {
         setLoading(false);
       }
     };
@@ -67,9 +101,16 @@ export default function Footer() {
     loadContact();
   }, []);
 
+  // =========================================================
+  // LOAD DISTRICT DATA
+  // =========================================================
+
   useEffect(() => {
     const loadDistrict = async () => {
-      if (!district) return;
+      if (!district) {
+        setDistrictData(null);
+        return;
+      }
 
       try {
         const snap = await getDoc(
@@ -83,38 +124,142 @@ export default function Footer() {
         );
 
         if (snap.exists()) {
-          setDistrictData(snap.data());
+          const data = snap.data();
+
+          console.log(
+            "DISTRICT FIREBASE DATA:",
+            data
+          );
+
+          setDistrictData(data);
         }
-      } catch (err) {
-        console.log(err);
+      } catch (error) {
+        console.error(
+          "Error loading district:",
+          error
+        );
       }
     };
 
     loadDistrict();
   }, [district]);
 
+  // =========================================================
+  // NORMALIZE CONTACT DATA
+  // =========================================================
+
+  const normalize = (value = "") => {
+    return String(value)
+      .toLowerCase()
+      .trim()
+      .replace(/[_-]+/g, " ")
+      .replace(/\s+/g, " ");
+  };
+
+  // =========================================================
+  // GET VALUE FROM CONTACT ARRAY
+  // =========================================================
+
+  const getContactValue = (types = []) => {
+    if (!Array.isArray(contactInfo)) return "";
+
+    const normalizedTypes = types.map(normalize);
+
+    const item = contactInfo.find((contact) => {
+      if (!contact) return false;
+
+      const label = normalize(
+        contact.label ||
+        contact.name ||
+        contact.title ||
+        contact.type ||
+        contact.key ||
+        ""
+      );
+
+      // EXACT MATCH ONLY
+      return normalizedTypes.includes(label);
+    });
+
+    if (!item) return "";
+
+    return String(
+      item.value ??
+      item.content ??
+      item.text ??
+      item.data ??
+      ""
+    ).trim();
+  };
+
+  // =========================================================
+  // CONTACT VALUES
+  // =========================================================
+
   const phone =
-    contactInfo.find(
-      (x) => x.label === "Phone Number"
-    )?.value || "";
+    getContactValue([
+      "phone",
+      "phone number",
+      "mobile",
+      "mobile number",
+      "contact number",
+      "telephone",
+      "tel",
+    ]) || "";
 
   const email =
-    contactInfo.find(
-      (x) => x.label === "Email Address"
-    )?.value || "";
+    getContactValue([
+      "email",
+      "email address",
+      "email id",
+      "mail",
+      "mail address",
+    ]) || "";
 
-  const address =
-    contactInfo.find(
-      (x) => x.label === "Office Address"
-    )?.value || "";
+  const firebaseAddress =
+    getContactValue([
+      "address",
+      "office",
+      "office address",
+      "office location",
+      "location",
+      "company address",
+      "business address",
+    ]) || "";
+
+  // =========================================================
+  // DISTRICT ADDRESS
+  // =========================================================
+
+  const districtName =
+    districtData?.district ||
+    districtData?.name ||
+    districtData?.city ||
+    "";
+
+  const districtState =
+    districtData?.state ||
+    districtData?.stateName ||
+    "India";
+
+  const districtAddress =
+    districtName
+      ? `${districtName}, ${districtState}, India`
+      : "";
 
   const dynamicAddress =
-    districtData
-      ? `${districtData.district}, ${districtData.state}, India`
-      : address;
+    districtAddress ||
+    firebaseAddress ||
+    "India";
+
+  // =========================================================
+  // ROUTING
+  // =========================================================
 
   const makeLink = (path) => {
-    if (!district) return path;
+    if (!district) {
+      return path;
+    }
 
     if (path === "/") {
       return `/${district}`;
@@ -122,152 +267,331 @@ export default function Footer() {
 
     return `/${district}${path}`;
   };
+
+  // =========================================================
+  // LOADING
+  // =========================================================
+
   if (loading) {
     return (
-      <footer className="bg-white border-t border-slate-200">
-        <div className="container-custom py-16">
+      <footer className="border-t border-slate-200 bg-white">
+        <div className="mx-auto max-w-7xl px-5 py-16 sm:px-6 lg:px-8">
 
-          <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-10">
+          <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
 
-            {[...Array(4)].map((_, i) => (
-              <div key={i}>
-                <div className="h-8 w-40 bg-slate-200 rounded animate-pulse mb-6" />
+            {[...Array(4)].map((_, index) => (
+              <div key={index}>
 
-                {[...Array(5)].map((_, j) => (
+                <div className="mb-6 h-7 w-40 animate-pulse rounded-lg bg-slate-200" />
+
+                {[...Array(4)].map((_, item) => (
                   <div
-                    key={j}
-                    className="h-5 bg-slate-200 rounded animate-pulse mb-4"
+                    key={item}
+                    className="mb-4 h-4 w-full animate-pulse rounded bg-slate-100"
                   />
                 ))}
+
               </div>
             ))}
 
           </div>
 
-          <div className="border-t border-slate-200 mt-12 pt-6">
-            <div className="h-5 w-72 bg-slate-200 rounded animate-pulse" />
+          <div className="mt-12 border-t border-slate-200 pt-6">
+            <div className="h-4 w-72 animate-pulse rounded bg-slate-100" />
           </div>
 
         </div>
       </footer>
     );
   }
-  return (
-    <footer className="bg-white border-t border-slate-200">
-      <div className="container-custom py-16">
 
-        <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-10">
+  // =========================================================
+  // FOOTER
+  // =========================================================
+
+  return (
+    <footer className="relative overflow-hidden border-t border-slate-200 bg-white">
+
+      {/* Background decoration */}
+
+      <div className="pointer-events-none absolute -right-40 -top-40 h-96 w-96 rounded-full bg-indigo-50 blur-3xl" />
+
+      <div className="pointer-events-none absolute -left-40 bottom-0 h-80 w-80 rounded-full bg-sky-50 blur-3xl" />
+
+      <div className="relative mx-auto max-w-7xl px-5 py-16 sm:px-6 lg:px-8">
+
+        {/* =================================================
+            MAIN FOOTER GRID
+        ================================================== */}
+
+        <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1.3fr]">
+
+          {/* =================================================
+              BRAND
+          ================================================== */}
 
           <div>
-            <h2 className="text-2xl font-bold text-sky-700">
-              Central
-              <span className="text-slate-900">
-                {" "}Biomedicals
-              </span>
-            </h2>
 
-            <p className="mt-5 text-slate-600 leading-7">
-              Delivering trusted diagnostic
-              and biomedical solutions with
-              innovation, quality, and
-              precision healthcare support.
+            <Link
+              href={makeLink("/")}
+              className="inline-block"
+            >
+              <h2 className="text-2xl font-black tracking-tight text-slate-950">
+                Rajbiosis{" "}
+                <span className="bg-gradient-to-r from-indigo-600 to-sky-600 bg-clip-text text-transparent">
+                  Private Limited
+                </span>
+              </h2>
+            </Link>
+
+            <p className="mt-5 max-w-sm text-sm leading-7 text-slate-600">
+              Delivering trusted diagnostic and biomedical
+              solutions with innovation, quality and precision
+              for modern healthcare facilities.
             </p>
+
+            <div className="mt-7 inline-flex items-center gap-2 rounded-full border border-indigo-100 bg-indigo-50 px-4 py-2 text-xs font-bold text-indigo-700">
+              <span className="h-2 w-2 rounded-full bg-indigo-600" />
+              Trusted Biomedical Solutions
+            </div>
+
           </div>
 
+          {/* =================================================
+              QUICK LINKS
+          ================================================== */}
+
           <div>
-            <h3 className="text-lg font-semibold mb-5">
+
+            <h3 className="text-sm font-black uppercase tracking-wider text-slate-900">
               Quick Links
             </h3>
 
-            <div className="flex flex-col gap-3 text-slate-600">
+            <div className="mt-6 flex flex-col gap-4">
 
-              <Link href={makeLink("/")}>
+              <Link
+                href={makeLink("/")}
+                className="group flex items-center gap-2 text-sm text-slate-600 transition hover:text-indigo-600"
+              >
+                <ArrowRight
+                  size={14}
+                  className="opacity-0 transition group-hover:translate-x-1 group-hover:opacity-100"
+                />
                 Home
               </Link>
 
-              <Link href={makeLink("/about")}>
-                About
+              <Link
+                href={makeLink("/about")}
+                className="group flex items-center gap-2 text-sm text-slate-600 transition hover:text-indigo-600"
+              >
+                <ArrowRight
+                  size={14}
+                  className="opacity-0 transition group-hover:translate-x-1 group-hover:opacity-100"
+                />
+                About Us
               </Link>
 
-              <Link href={makeLink("/services")}>
+              <Link
+                href={makeLink("/services")}
+                className="group flex items-center gap-2 text-sm text-slate-600 transition hover:text-indigo-600"
+              >
+                <ArrowRight
+                  size={14}
+                  className="opacity-0 transition group-hover:translate-x-1 group-hover:opacity-100"
+                />
                 Services
               </Link>
 
-              <Link href={makeLink("/items")}>
+              <Link
+                href={makeLink("/items")}
+                className="group flex items-center gap-2 text-sm text-slate-600 transition hover:text-indigo-600"
+              >
+                <ArrowRight
+                  size={14}
+                  className="opacity-0 transition group-hover:translate-x-1 group-hover:opacity-100"
+                />
                 Products
               </Link>
 
-              <Link href={makeLink("/contact")}>
+              <Link
+                href={makeLink("/contact")}
+                className="group flex items-center gap-2 text-sm text-slate-600 transition hover:text-indigo-600"
+              >
+                <ArrowRight
+                  size={14}
+                  className="opacity-0 transition group-hover:translate-x-1 group-hover:opacity-100"
+                />
                 Contact
               </Link>
 
             </div>
+
           </div>
 
+          {/* =================================================
+              SERVICES
+          ================================================== */}
+
           <div>
-            <h3 className="text-lg font-semibold mb-5">
-              Services
+
+            <h3 className="text-sm font-black uppercase tracking-wider text-slate-900">
+              Our Services
             </h3>
 
-            <div className="flex flex-col gap-3 text-slate-600">
-              <p>Diagnostic Equipment</p>
-              <p>Laboratory Solutions</p>
-              <p>Biomedical Instruments</p>
-              <p>Maintenance Support</p>
+            <div className="mt-6 flex flex-col gap-4 text-sm text-slate-600">
+
+              <p className="transition hover:text-indigo-600">
+                Diagnostic Equipment
+              </p>
+
+              <p className="transition hover:text-indigo-600">
+                Laboratory Solutions
+              </p>
+
+              <p className="transition hover:text-indigo-600">
+                Biomedical Instruments
+              </p>
+
+              <p className="transition hover:text-indigo-600">
+                Laboratory Automation
+              </p>
+
+              <p className="transition hover:text-indigo-600">
+                Maintenance Support
+              </p>
+
             </div>
+
           </div>
 
+          {/* =================================================
+              CONTACT
+          ================================================== */}
+
           <div>
-            <h3 className="text-lg font-semibold mb-5">
-              Contact Info
+
+            <h3 className="text-sm font-black uppercase tracking-wider text-slate-900">
+              Contact Us
             </h3>
 
-            <div className="space-y-4 text-slate-600">
+            <div className="mt-6 space-y-5">
 
-              <div className="flex items-start gap-3">
-                <MapPin
-                  size={18}
-                  className="mt-1 text-sky-700"
-                />
-                <p>{dynamicAddress}</p>
+              {/* ADDRESS */}
+
+              <div className="flex items-start gap-4">
+
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
+                  <MapPin size={18} />
+                </div>
+
+                <div>
+
+                  <p className="text-xs font-bold uppercase tracking-wide text-slate-400">
+                    Office Address
+                  </p>
+
+                  <p className="mt-1 text-sm leading-6 text-slate-600">
+                    {dynamicAddress}
+                  </p>
+
+                </div>
+
               </div>
 
-              <div className="flex items-center gap-3">
-                <Phone
-                  size={18}
-                  className="text-sky-700"
-                />
-                <p>{phone}</p>
-              </div>
+              {/* PHONE */}
 
-              <div className="flex items-center gap-3">
-                <Mail
-                  size={18}
-                  className="text-sky-700"
-                />
-                <p>{email}</p>
-              </div>
+              {phone && (
+                <a
+                  href={`tel:${String(phone).replace(/\s+/g, "")}`}
+                  className="flex items-center gap-4 group"
+                >
+
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 transition group-hover:bg-indigo-600 group-hover:text-white">
+                    <Phone size={18} />
+                  </div>
+
+                  <div>
+
+                    <p className="text-xs font-bold uppercase tracking-wide text-slate-400">
+                      Phone
+                    </p>
+
+                    <p className="mt-1 text-sm font-semibold text-slate-700 transition group-hover:text-indigo-600">
+                      {phone}
+                    </p>
+
+                  </div>
+
+                </a>
+              )}
+
+              {/* EMAIL */}
+
+              {email && (
+                <a
+                  href={`mailto:${email}`}
+                  className="flex items-center gap-4 group"
+                >
+
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 transition group-hover:bg-indigo-600 group-hover:text-white">
+                    <Mail size={18} />
+                  </div>
+
+                  <div className="min-w-0">
+
+                    <p className="text-xs font-bold uppercase tracking-wide text-slate-400">
+                      Email
+                    </p>
+
+                    <p className="mt-1 break-all text-sm font-semibold text-slate-700 transition group-hover:text-indigo-600">
+                      {email}
+                    </p>
+
+                  </div>
+
+                </a>
+              )}
+
+              {/* FALLBACK */}
+
+              {!phone && !email && !firebaseAddress && (
+                <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 p-4 text-sm text-slate-500">
+                  Contact information will be updated soon.
+                </div>
+              )}
 
             </div>
+
           </div>
 
         </div>
 
-        <div className="border-t border-slate-200 mt-12 pt-6 flex flex-col md:flex-row justify-between items-center text-sm text-slate-500">
+        {/* =================================================
+            BOTTOM
+        ================================================== */}
 
-          <p>
-            © 2026 Central Biomedicals.
-            All rights reserved.
-          </p>
+        <div className="mt-14 border-t border-slate-200 pt-7">
 
-          <p className="mt-3 md:mt-0">
-            Designed with precision for
-            modern diagnostics.
-          </p>
+          <div className="flex flex-col gap-4 text-sm text-slate-500 md:flex-row md:items-center md:justify-between">
+
+            <p>
+              © {new Date().getFullYear()}{" "}
+              <span className="font-semibold text-slate-700">
+                Central Biomedicals
+              </span>
+              . All rights reserved.
+            </p>
+
+            <p>
+              Designed with precision for modern diagnostics.
+            </p>
+
+          </div>
 
         </div>
 
       </div>
+
     </footer>
   );
 }
