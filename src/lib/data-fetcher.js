@@ -99,7 +99,7 @@ export async function fetchFullCatalog() {
                   uid: `${categoryDoc.id}-${subDoc.id}-${index}`,
                   category: categoryName,
                   subCategory: subCategoryName,
-                  slug: item.slug || makeSlug(item.title),
+                  slug: item.slug || item.productSlug || makeSlug(item.title || item.name || ""),
                 }));
 
               allProducts.push(...categoryProducts);
@@ -117,7 +117,7 @@ export async function fetchFullCatalog() {
                 uid: `${categoryDoc.id}-direct-${index}`,
                 category: categoryName,
                 subCategory: item.subCategory || categoryName,
-                slug: item.slug || makeSlug(item.title),
+                slug: item.slug || item.productSlug || makeSlug(item.title || item.name || ""),
               }));
             allProducts.push(...directProducts);
           }
@@ -144,7 +144,7 @@ export async function fetchFullCatalog() {
               uid: `other-${index}`,
               category: "Other Products",
               subCategory: item.subCategory || "Other Products",
-              slug: item.slug || makeSlug(item.title),
+              slug: item.slug || item.productSlug || makeSlug(item.title || item.name || ""),
             }));
 
           allProducts.push(...oldProducts);

@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import toast from "react-hot-toast";
-
+import ProductBrochureButton from "@/components/ProductBrochureButton"
 import { usePathname } from "next/navigation";
 
 import {
@@ -15,10 +15,8 @@ import {
     FaLink,
 } from "react-icons/fa";
 
+import { fetchFullCatalog } from "@/lib/data-fetcher";
 import {
-    doc,
-    getDoc,
-    getDocs,
     addDoc,
     collection,
 } from "firebase/firestore";
@@ -31,6 +29,7 @@ const makeSlug = (text = "") =>
         .replace(/\s+/g, "-");
 export default function ProductDetails({ slug }) {
     const [product, setProduct] = useState(null);
+    const [loading, setLoading] = useState(true);
     const [imageLoaded, setImageLoaded] = useState(false);
     const [selectedImage, setSelectedImage] = useState("");
     const [selectedMedia, setSelectedMedia] = useState("image");
@@ -61,102 +60,73 @@ export default function ProductDetails({ slug }) {
         city.slice(1);
 
     useEffect(() => {
-        const loadProduct = async () => {
-            try {
+  const loadProduct = async () => {
+    try {
+        setLoading(true);
 
-                // NORMAL PRODUCTS
-                const snap = await getDoc(
-                    doc(
-                        db,
-                        "websites",
-                        "ozallecom",
-                        "pages",
-                        "products"
-                    )
-                );
+        const allProducts = await fetchFullCatalog();
+        const targetSlug = decodeURIComponent(slug || "").trim().toLowerCase();
 
-                let allProducts = [];
+        const found = allProducts.find(
+            (p) =>
+                p.slug === slug ||
+                p.productSlug === slug ||
+                (p.slug && p.slug.trim().toLowerCase() === targetSlug) ||
+                (p.productSlug && p.productSlug.trim().toLowerCase() === targetSlug) ||
+                (p.title && makeSlug(p.title) === targetSlug) ||
+                (p.name && makeSlug(p.name) === targetSlug)
+        );
 
-                if (snap.exists()) {
-                    allProducts = (snap.data().products || []).map((item) => ({
-                        ...item,
-                        slug:
-                            item.slug ||
-                            item.productSlug ||
-                            makeSlug(item.title),
-                    }));
-                }
+        if (!found) {
+            console.error(
+                "PRODUCT NOT FOUND FOR SLUG:",
+                slug
+            );
 
-                // CATEGORY PRODUCTS
-                const categorySnap = await getDocs(
-                    collection(
-                        db,
-                        "websites",
-                        "ozallecom",
-                        "pages",
-                        "categoryproducts",
-                        "categories"
-                    )
-                );
+            setProduct(null);
+            return;
+        }
 
-                categorySnap.forEach((docSnap) => {
-                    const data = docSnap.data();
+        setProduct(found);
 
-                    if (data.products?.length) {
-                        allProducts.push(
-                            ...(data.products || []).map((item) => ({
-                                ...item,
-                                slug:
-                                    item.slug ||
-                                    item.productSlug ||
-                                    makeSlug(item.title),
-                            }))
-                        );
-                    }
-                });
+        /*
+        -----------------------------------------
+        PRODUCT IMAGE
+        -----------------------------------------
+        */
 
-                const found = allProducts.find(
-                    (p) => p.slug === slug
-                );
-                console.log("URL SLUG:", slug);
+        if (
+            Array.isArray(
+                found.images
+            ) &&
+            found.images.length >
+                0
+        ) {
+            setSelectedImage(
+                found.images[0]
+            );
+        } else {
+            setSelectedImage(
+                found.image ||
+                found.imageUrl ||
+                ""
+            );
+        }
 
-                allProducts.forEach((p) => {
-                    console.log("PRODUCT:", p.title);
-                    console.log("PRODUCT SLUG:", p.slug);
-                });
-                console.log("SLUG FROM URL:", slug);
-                console.log(
-                    "TOTAL PRODUCTS:",
-                    allProducts.length
-                );
-                console.log(
-                    "FOUND PRODUCT:",
-                    found
-                );
+        setSelectedMedia(
+            "image"
+        );
+    } catch (error) {
+        console.error(
+            "PRODUCT LOAD ERROR:",
+            error
+        );
 
-                setProduct(found || null);
-
-                if (found) {
-
-                    if (
-                        found.images?.length > 0
-                    ) {
-                        setSelectedImage(
-                            found.images[0]
-                        );
-                    } else {
-                        setSelectedImage(
-                            found.image || ""
-                        );
-                    }
-
-                    setSelectedMedia("image");
-                }
-
-            } catch (error) {
-                console.error(error);
-            }
-        };
+        setProduct(null);
+    } finally {
+        setLoading(false);
+    }
+};
 
         loadProduct();
     }, [slug]);
@@ -327,58 +297,92 @@ ${product?.desc}
             document.removeEventListener("mousedown", close);
     }, []);
 
-    if (!product) {
-        return (
-            <section className="py-10 md:py-20 bg-slate-50">
-                <div className="container-custom">
+if (loading) {
+    return (
+        <section className="py-10 md:py-20 bg-slate-50">
+            <div className="container-custom">
 
-                    <div className="grid lg:grid-cols-2 gap-12">
+                <div className="grid lg:grid-cols-2 gap-12">
 
-                        <div className="h-[420px] md:h-[520px] rounded-[36px] bg-slate-200 animate-pulse" />
+                    <div className="h-[420px] md:h-[520px] rounded-[36px] bg-slate-200 animate-pulse" />
 
-                        <div>
-                            <div className="h-12 w-3/4 bg-slate-200 rounded-xl animate-pulse mb-8" />
+                    <div>
+                        <div className="h-12 w-3/4 bg-slate-200 rounded-xl animate-pulse mb-8" />
 
-                            {[...Array(8)].map((_, i) => (
-                                <div
-                                    key={i}
-                                    className="h-6 bg-slate-200 rounded-lg animate-pulse mb-4"
-                                />
-                            ))}
-                        </div>
+                        {[...Array(8)].map((_, i) => (
+                            <div
+                                key={i}
+                                className="h-6 bg-slate-200 rounded-lg animate-pulse mb-4"
+                            />
+                        ))}
+                    </div>
+
+                </div>
+
+                <div className="mt-16 grid lg:grid-cols-[600px_1fr] gap-8">
+
+                    <div className="bg-white rounded-[24px] md:rounded-[32px] p-5 sm:p-6 md:p-8 shadow-sm">
+
+                        <div className="h-10 w-48 bg-slate-200 rounded-lg animate-pulse mb-6" />
+
+                        {[...Array(4)].map((_, i) => (
+                            <div
+                                key={i}
+                                className="h-14 bg-slate-200 rounded-2xl animate-pulse mb-4"
+                            />
+                        ))}
 
                     </div>
 
-                    <div className="mt-16 grid lg:grid-cols-[600px_1fr] gap-8">
+                    <div className="bg-white rounded-[24px] md:rounded-[32px] p-5 sm:p-6 md:p-8 shadow-sm">
 
-                        <div className="bg-white rounded-[24px] md:rounded-[32px] p-5 sm:p-6 md:p-8 shadow-sm">
-                            <div className="h-10 w-48 bg-slate-200 rounded-lg animate-pulse mb-6" />
+                        <div className="h-10 w-60 bg-slate-200 rounded-lg animate-pulse mb-6" />
 
-                            {[...Array(4)].map((_, i) => (
-                                <div
-                                    key={i}
-                                    className="h-14 bg-slate-200 rounded-2xl animate-pulse mb-4"
-                                />
-                            ))}
-                        </div>
-
-                        <div className="bg-white rounded-[24px] md:rounded-[32px] p-5 sm:p-6 md:p-8 shadow-sm">
-                            <div className="h-10 w-60 bg-slate-200 rounded-lg animate-pulse mb-6" />
-
-                            {[...Array(6)].map((_, i) => (
-                                <div
-                                    key={i}
-                                    className="h-5 bg-slate-200 rounded animate-pulse mb-4"
-                                />
-                            ))}
-                        </div>
+                        {[...Array(6)].map((_, i) => (
+                            <div
+                                key={i}
+                                className="h-5 bg-slate-200 rounded animate-pulse mb-4"
+                            />
+                        ))}
 
                     </div>
 
                 </div>
-            </section>
-        );
-    }
+
+            </div>
+        </section>
+    );
+}
+
+if (!product) {
+    return (
+        <section className="py-20 bg-slate-50">
+            <div className="container-custom text-center">
+
+                <div className="bg-white rounded-3xl p-10 shadow-sm">
+
+                    <h1 className="text-3xl font-bold text-slate-900 mb-4">
+                        Product Not Found
+                    </h1>
+
+                    <p className="text-slate-500 mb-6">
+                        The product you are looking for could not be found.
+                    </p>
+
+                    <a
+                        href="/products"
+                        className="inline-flex px-6 py-3 rounded-xl bg-sky-600 text-white font-semibold"
+                    >
+                        Back to Products
+                    </a>
+
+                </div>
+
+            </div>
+        </section>
+    );
+}
+
     return (
         <section className="py-10 md:py-20 bg-slate-50">
             <script
@@ -527,9 +531,19 @@ ${product?.desc}
 
                         <div className="flex justify-between items-start gap-4 relative">
 
-                            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-tight text-slate-900">
-                                {product.title}
-                            </h1>
+                            <div className="flex-1">
+
+    <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold leading-tight text-slate-900">
+        {product.title}
+    </h1>
+
+    <div className="mt-5">
+        <ProductBrochureButton
+            product={product}
+        />
+    </div>
+
+</div>
 
                             <div
                                 ref={shareRef}
