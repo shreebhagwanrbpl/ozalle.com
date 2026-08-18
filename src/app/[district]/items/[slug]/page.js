@@ -33,6 +33,7 @@ export async function generateMetadata({ params }) {
     product?.description ||
     `Leading supplier, dealer and distributor of ${productName} in ${cityName}. Contact Central Biomedicals for quick pricing, installation, and laboratory support.`;
 
+  const canonicalUrl = `https://ozallecom.com/items/${slug}`;
   const url = `https://ozallecom.com/${district}/items/${slug}`;
   const imageUrl = product?.images?.[0] || product?.image || "https://ozallecom.com/logo.png";
 
@@ -48,7 +49,7 @@ export async function generateMetadata({ params }) {
       "Central Biomedicals",
     ],
     alternates: {
-      canonical: url,
+      canonical: canonicalUrl,
     },
     openGraph: {
       title,

@@ -68,9 +68,31 @@ export const metadata = {
 export default function RootLayout({
   children,
 }) {
+  const organizationSchema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "Raj Biosis Private Limited",
+    alternateName: "Central Biomedicals",
+    url: "https://ozallecom.com",
+    logo: "https://ozallecom.com/logo.png",
+    description: "Leading biomedical, laboratory, diagnostic, and pathology equipment supplier, dealer, and distributor in India.",
+    contactPoint: {
+      "@type": "ContactPoint",
+      telephone: "+91-9829000000",
+      contactType: "customer service",
+      areaServed: "IN",
+      availableLanguage: ["en", "hi"],
+    },
+    sameAs: [],
+  };
+
   return (
     <html lang="en">
       <body className="antialiased">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+        />
         <Navbar />
 
         <main>

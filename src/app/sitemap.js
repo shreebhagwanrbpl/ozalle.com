@@ -1,139 +1,81 @@
 import { db } from "@/lib/firebase";
-import {
-    collection,
-    getDocs,
-    doc,
-    getDoc,
-} from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
+import { fetchFullCatalog } from "@/lib/data-fetcher-server";
 
 export default async function sitemap() {
-    const baseUrl =
-        "https://ozallecom.com";
-
+    const baseUrl = "https://ozallecom.com";
     const urls = [];
 
-    // Static Pages
+    // 1. Static Core Pages
     urls.push(
         {
             url: baseUrl,
             lastModified: new Date(),
+            changeFrequency: "daily",
+            priority: 1.0,
         },
         {
             url: `${baseUrl}/about`,
             lastModified: new Date(),
+            changeFrequency: "monthly",
+            priority: 0.8,
         },
         {
             url: `${baseUrl}/services`,
             lastModified: new Date(),
+            changeFrequency: "weekly",
+            priority: 0.9,
         },
         {
             url: `${baseUrl}/contact`,
             lastModified: new Date(),
+            changeFrequency: "monthly",
+            priority: 0.7,
         },
         {
             url: `${baseUrl}/items`,
             lastModified: new Date(),
+            changeFrequency: "daily",
+            priority: 0.9,
         }
     );
 
     try {
-        // DISTRICTS
-        const districtSnap =
-            await getDocs(
-                collection(
-                    db,
-                    "websites",
-                    "ozallecom",
-                    "districts"
-                )
-            );
+        // 2. Legitimate Districts
+        const districtSnap = await getDocs(
+            collection(db, "websites", "ozallecom", "districts")
+        );
 
-        const districts =
-            districtSnap.docs.map(
-                (doc) => doc.data()
-            );
+        const districts = districtSnap.docs.map((d) => d.data());
 
         districts.forEach((district) => {
-            const slug =
-                district.slug;
-
+            const slug = district.slug;
             if (!slug) return;
 
-            urls.push(
-                {
-                    url: `${baseUrl}/${slug}`,
-                    lastModified:
-                        new Date(),
-                },
-                {
-                    url: `${baseUrl}/${slug}/about`,
-                    lastModified:
-                        new Date(),
-                },
-                {
-                    url: `${baseUrl}/${slug}/services`,
-                    lastModified:
-                        new Date(),
-                },
-                {
-                    url: `${baseUrl}/${slug}/contact`,
-                    lastModified:
-                        new Date(),
-                },
-                {
-                    url: `${baseUrl}/${slug}/items`,
-                    lastModified:
-                        new Date(),
-                }
-            );
+            urls.push({
+                url: `${baseUrl}/${slug}`,
+                lastModified: new Date(),
+                changeFrequency: "weekly",
+                priority: 0.8,
+            });
         });
 
-        // PRODUCTS
-        const productDoc =
-            await getDoc(
-                doc(
-                    db,
-                    "websites",
-                    "ozallecom",
-                    "pages",
-                    "products"
-                )
-            );
+        // 3. Primary Products (Full Catalog)
+        const products = await fetchFullCatalog();
 
-        const products =
-            productDoc.data()
-                ?.products || [];
+        products.forEach((product) => {
+            const productSlug = product.slug || product.productSlug;
+            if (!productSlug) return;
 
-        products.forEach(
-            (product) => {
-                if (!product.slug) return;
-
-                // Main Product URL
-                urls.push({
-                    url: `${baseUrl}/items/${product.slug}`,
-                    lastModified:
-                        new Date(),
-                });
-
-                // District Product URLs
-                districts.forEach(
-                    (district) => {
-                        if (!district.slug) return;
-
-                        urls.push({
-                            url: `${baseUrl}/${district.slug}/items/${product.slug}`,
-                            lastModified:
-                                new Date(),
-                        });
-                    }
-                );
-            }
-        );
+            urls.push({
+                url: `${baseUrl}/items/${productSlug}`,
+                lastModified: new Date(),
+                changeFrequency: "weekly",
+                priority: 0.9,
+            });
+        });
     } catch (error) {
-        console.error(
-            "Sitemap Error:",
-            error
-        );
+        console.error("Sitemap Error:", error);
     }
 
     return urls;

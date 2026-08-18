@@ -16,6 +16,19 @@ import {
 
 import PageBanner from "@/components/PageBanner";
 
+export const metadata = {
+  title: "About Us | Biomedical & Laboratory Equipment Supplier - Raj Biosis",
+  description: "Learn about Raj Biosis Private Limited (Central Biomedicals), leading supplier, dealer and distributor of biomedical and laboratory equipment across India.",
+  alternates: {
+    canonical: "https://ozallecom.com/about",
+  },
+  openGraph: {
+    title: "About Us | Raj Biosis Biomedical Equipment Supplier",
+    description: "Delivering trusted diagnostic and biomedical technologies with innovation, quality, and healthcare precision.",
+    url: "https://ozallecom.com/about",
+  },
+};
+
 export default function AboutPage() {
   return (
     <>

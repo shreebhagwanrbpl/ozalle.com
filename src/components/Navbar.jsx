@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import {
@@ -122,34 +123,14 @@ export default function Navbar() {
               className="group flex items-center gap-3"
             >
 
-              {/* Logo Icon */}
-
-              <div className="relative flex h-11 w-11 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-cyan-600 via-cyan-600 to-cyan-800 shadow-lg shadow-cyan-600/20 transition duration-300 group-hover:scale-105">
-
-                <div className="absolute inset-0 bg-white/10" />
-
-                <span className="relative text-lg font-black text-white">
-                  R
-                </span>
-
-              </div>
-
-              {/* Logo Text */}
-
-              <div className="leading-none">
-
-                <div className="text-[18px] font-black tracking-[-0.03em] text-cyan-950 sm:text-xl">
-                  Raj{" "}
-                  <span className="bg-gradient-to-r from-cyan-600 to-cyan-600 bg-clip-text text-transparent">
-                    Biosis
-                  </span>
-                </div>
-
-                <div className="mt-1 hidden text-[9px] font-semibold uppercase tracking-[0.18em] text-slate-400 sm:block">
-                  Biomedical & Healthcare Solutions
-                </div>
-
-              </div>
+              <Image
+                src="/logo.png"
+                alt="Raj Biosis Private Limited - Biomedical & Healthcare Solutions"
+                width={200}
+                height={50}
+                className="h-10 sm:h-12 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+                priority
+              />
 
             </Link>
 

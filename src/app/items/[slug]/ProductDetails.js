@@ -3,7 +3,8 @@
 import { useEffect, useState, useRef } from "react";
 import Image from "next/image";
 import toast from "react-hot-toast";
-import ProductBrochureButton from "@/components/ProductBrochureButton"
+import ProductBrochureButton from "@/components/ProductBrochureButton";
+import Breadcrumbs from "@/components/Breadcrumbs";
 import { usePathname } from "next/navigation";
 
 import {
@@ -399,9 +400,12 @@ if (!product) {
                 }}
             />
             <div className="container-custom">
-                <div className="mb-6 text-sm text-slate-500">
-                    Home / Products / {product.title}
-                </div>
+                <Breadcrumbs
+                    items={[
+                        { name: "Products", url: "/items" },
+                        { name: product.title, url: `/items/${product.slug || slug}` },
+                    ]}
+                />
                 {/* Top Section */}
 
                 <div className="grid lg:grid-cols-2 gap-12">
@@ -470,7 +474,7 @@ if (!product) {
 
                                     <Image
                                         src={img}
-                                        alt=""
+                                        alt={`${product.title} view ${index + 1}`}
                                         width={80}
                                         height={80}
                                         className="w-full h-full object-cover"

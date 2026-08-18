@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { fetchFullCatalog } from "@/lib/data-fetcher";
 import {
   Microscope,
   FlaskConical,
@@ -15,21 +16,43 @@ import {
   ArrowRight,
   BadgeCheck,
   Activity,
+  Package,
 } from "lucide-react";
 
 import ServiceCard from "@/components/ServiceCard";
+import ProductCard from "@/components/ProductCard";
 import IMG from "../components/img/img.png";
 
 
 export default function HeroSection({ city }) {
   const [loading, setLoading] = useState(true);
   const [services, setServices] = useState([]);
+  const [featuredProducts, setFeaturedProducts] = useState([]);
+  const [productsLoading, setProductsLoading] = useState(true);
   const [heroData, setHeroData] = useState({
     title: "",
     description: "",
     button1Text: "",
     button2Text: "",
   });
+
+  useEffect(() => {
+    const loadCatalog = async () => {
+      try {
+        setProductsLoading(true);
+        const catalog = await fetchFullCatalog();
+        if (catalog && catalog.length > 0) {
+          setFeaturedProducts(catalog.slice(0, 6));
+        }
+      } catch (err) {
+        console.error("Error fetching catalog for homepage:", err);
+      } finally {
+        setProductsLoading(false);
+      }
+    };
+
+    loadCatalog();
+  }, []);
   useEffect(() => {
     const fetchServices = async () => {
       try {
@@ -332,10 +355,13 @@ export default function HeroSection({ city }) {
 
             <div className="overflow-hidden rounded-[40px] border border-cyan-100 bg-white p-4 shadow-[0_20px_60px_rgba(8,145,178,0.15)]">
 
-              <img
-                src="https://mpplindia.in/wp-content/uploads/2018/12/Biomedical-Equipment-in-Indian-Railways.jpg"
-                alt="About Central Biomedicals"
+              <Image
+                src="/about-biomedical.jpg"
+                alt="Raj Biosis Biomedical Laboratory Equipment & Solutions"
+                width={800}
+                height={600}
                 className="h-[600px] w-full rounded-[30px] object-cover transition duration-700 hover:scale-105"
+                priority={false}
               />
 
             </div>
@@ -584,6 +610,62 @@ export default function HeroSection({ city }) {
 
       </section>
 
+      {/* =====================================================
+          FEATURED PRODUCTS SECTION
+      ====================================================== */}
+      <section className="section-padding bg-slate-50 border-t border-b border-slate-200/60">
+        <div className="container-custom">
+          <div className="mx-auto max-w-3xl text-center">
+            <span className="inline-flex items-center gap-2 rounded-full border border-cyan-200 bg-cyan-50 px-4 py-2 text-sm font-bold text-cyan-700">
+              <Package size={16} />
+              Featured Products
+            </span>
+
+            <h2 className="mt-6 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl md:text-5xl">
+              Advanced Biomedical &{" "}
+              <span className="bg-gradient-to-r from-cyan-600 to-indigo-600 bg-clip-text text-transparent">
+                Laboratory Equipment
+              </span>
+            </h2>
+
+            <p className="mx-auto mt-4 max-w-2xl text-base leading-8 text-slate-600 sm:text-lg">
+              Explore our range of high-precision diagnostic analyzers, hematology instruments, and medical laboratory solutions.
+            </p>
+          </div>
+
+          {productsLoading ? (
+            <div className="mt-12 grid gap-6">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="h-44 rounded-3xl bg-white shadow animate-pulse border border-slate-200" />
+              ))}
+            </div>
+          ) : featuredProducts.length > 0 ? (
+            <div className="mt-12 grid gap-6">
+              {featuredProducts.map((product) => (
+                <ProductCard
+                  key={product.uid || product.slug}
+                  product={product}
+                  district={districtSlug}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="mt-12 text-center text-slate-500 py-10 bg-white rounded-3xl border border-slate-200">
+              No featured products available at the moment.
+            </div>
+          )}
+
+          <div className="mt-12 text-center">
+            <Link
+              href={makeLink("/items")}
+              className="group inline-flex items-center gap-3 rounded-2xl bg-cyan-700 px-8 py-4 text-sm font-bold text-white shadow-xl shadow-cyan-700/20 transition-all duration-300 hover:-translate-y-1 hover:bg-cyan-800"
+            >
+              <span>Explore All Products</span>
+              <ArrowRight size={18} className="transition-transform duration-300 group-hover:translate-x-1" />
+            </Link>
+          </div>
+        </div>
+      </section>
 
       <section className="section-padding bg-gradient-to-b from-white to-cyan-50/30">
         <div className="container-custom">
