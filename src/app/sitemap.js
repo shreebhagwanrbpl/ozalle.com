@@ -3,7 +3,7 @@ import { collection, getDocs } from "firebase/firestore";
 import { fetchFullCatalog } from "@/lib/data-fetcher-server";
 
 export default async function sitemap() {
-    const baseUrl = "https://ozallecom.com";
+    const baseUrl = "https://ozalle.com";
     const urls = [];
 
     // 1. Static Core Pages
