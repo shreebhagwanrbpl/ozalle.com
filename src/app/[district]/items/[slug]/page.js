@@ -33,9 +33,9 @@ export async function generateMetadata({ params }) {
     product?.description ||
     `Leading supplier, dealer and distributor of ${productName} in ${cityName}. Contact Central Biomedicals for quick pricing, installation, and laboratory support.`;
 
-  const canonicalUrl = `https://ozallecom.com/items/${slug}`;
-  const url = `https://ozallecom.com/${district}/items/${slug}`;
-  const imageUrl = product?.images?.[0] || product?.image || "https://ozallecom.com/logo.png";
+  const canonicalUrl = `https://ozalle.com/items/${slug}`;
+  const url = `https://ozalle.com/${district}/items/${slug}`;
+  const imageUrl = product?.images?.[0] || product?.image || "https://ozalle.com/logo.png";
 
   return {
     title,
@@ -73,7 +73,7 @@ export async function generateMetadata({ params }) {
       description,
       images: [imageUrl],
     },
-    metadataBase: new URL("https://ozallecom.com"),
+    metadataBase: new URL("https://ozalle.com"),
   };
 }
 

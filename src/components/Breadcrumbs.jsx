@@ -8,7 +8,7 @@ export default function Breadcrumbs({ items = [] }) {
     "@type": "ListItem",
     position: index + 1,
     name: item.name,
-    item: item.url.startsWith("http") ? item.url : `https://ozallecom.com${item.url}`,
+    item: item.url.startsWith("http") ? item.url : `https://ozalle.com${item.url}`,
   }));
 
   const jsonLd = {

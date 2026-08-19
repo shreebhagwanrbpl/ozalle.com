@@ -28,8 +28,8 @@ export async function generateMetadata({ params }) {
     product?.description ||
     `Buy ${productName} at best price in India. Trusted supplier, dealer and distributor of ${productName} for hospitals, laboratories, diagnostic centers, research institutes and healthcare facilities. Contact Central Biomedicals for quotation.`;
 
-  const url = `https://ozallecom.com/items/${slug}`;
-  const imageUrl = product?.images?.[0] || product?.image || "https://ozallecom.com/logo.png";
+  const url = `https://ozalle.com/items/${slug}`;
+  const imageUrl = product?.images?.[0] || product?.image || "https://ozalle.com/logo.png";
 
   return {
     title,
@@ -90,7 +90,7 @@ export async function generateMetadata({ params }) {
         "max-snippet": -1,
       },
     },
-    metadataBase: new URL("https://ozallecom.com"),
+    metadataBase: new URL("https://ozalle.com"),
   };
 }
 
@@ -116,7 +116,7 @@ export default async function Page({ params }) {
     product?.desc ||
     product?.description ||
     `High precision biomedical equipment ${productName} supplied across India by Central Biomedicals.`;
-  const imageUrl = product?.images?.[0] || product?.image || "https://ozallecom.com/logo.png";
+  const imageUrl = product?.images?.[0] || product?.image || "https://ozalle.com/logo.png";
 
   const productJsonLd = {
     "@context": "https://schema.org",
@@ -131,7 +131,7 @@ export default async function Page({ params }) {
     },
     offers: {
       "@type": "Offer",
-      url: `https://ozallecom.com/items/${slug}`,
+      url: `https://ozalle.com/items/${slug}`,
       priceCurrency: "INR",
       availability: "https://schema.org/InStock",
       seller: {
@@ -149,19 +149,19 @@ export default async function Page({ params }) {
         "@type": "ListItem",
         position: 1,
         name: "Home",
-        item: "https://ozallecom.com",
+        item: "https://ozalle.com",
       },
       {
         "@type": "ListItem",
         position: 2,
         name: "Items",
-        item: "https://ozallecom.com/items",
+        item: "https://ozalle.com/items",
       },
       {
         "@type": "ListItem",
         position: 3,
         name: productName,
-        item: `https://ozallecom.com/items/${slug}`,
+        item: `https://ozalle.com/items/${slug}`,
       },
     ],
   };

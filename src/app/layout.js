@@ -5,7 +5,7 @@ import { Toaster } from "react-hot-toast";
 
 export const metadata = {
   metadataBase: new URL(
-    "https://ozallecom.com"
+    "https://ozalle.com"
   ),
 
   title:
@@ -31,7 +31,7 @@ export const metadata = {
     description:
       "Supplier of biomedical and laboratory equipment across India.",
 
-    url: "https://ozallecom.com",
+    url: "https://ozalle.com",
 
     siteName: "Central Biomedicals",
 
@@ -61,7 +61,7 @@ export const metadata = {
   },
 
   alternates: {
-    canonical: "https://ozallecom.com",
+    canonical: "https://ozalle.com",
   },
 };
 
@@ -73,8 +73,8 @@ export default function RootLayout({
     "@type": "Organization",
     name: "Raj Biosis Private Limited",
     alternateName: "Central Biomedicals",
-    url: "https://ozallecom.com",
-    logo: "https://ozallecom.com/logo.png",
+    url: "https://ozalle.com",
+    logo: "https://ozalle.com/logo.png",
     description: "Leading biomedical, laboratory, diagnostic, and pathology equipment supplier, dealer, and distributor in India.",
     contactPoint: {
       "@type": "ContactPoint",

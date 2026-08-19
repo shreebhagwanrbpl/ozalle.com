@@ -23,6 +23,33 @@ import { useEffect, useState } from "react";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
+const defaultServices = [
+  {
+    title: "Diagnostic Equipment & Analyzers Supply",
+    desc: "Complete supply and distribution of CBC machines, 3-part & 5-part hematology analyzers, fully automated biochemistry analyzers, and ELISA readers across India.",
+  },
+  {
+    title: "Laboratory Setup & Installation",
+    desc: "Turnkey diagnostic laboratory planning, calibration, installation, and operational setup tailored for hospitals, pathology labs, and clinics.",
+  },
+  {
+    title: "Biomedical Maintenance & AMC Services",
+    desc: "Annual Maintenance Contracts (AMC), preventive maintenance, regular calibration, and rapid troubleshooting to ensure minimal downtime for critical analyzers.",
+  },
+  {
+    title: "Reagents & Diagnostic Kits Distribution",
+    desc: "Timely supply of high-grade reagents, controls, calibrators, electrolyte packs, and rapid diagnostic testing kits with cold-chain management.",
+  },
+  {
+    title: "Technical Training & Staff Support",
+    desc: "Comprehensive on-site application training, operator certification, and technical guidance for lab technicians and hospital staff.",
+  },
+  {
+    title: "Quality Control & Validation Assistance",
+    desc: "Assistance with internal quality control (IQC), external quality assessment (EQAS) compliance, and diagnostic standard validation.",
+  },
+];
+
 export default function ServicesPage() {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -49,11 +76,14 @@ export default function ServicesPage() {
           )
         );
 
-        if (snap.exists()) {
-          setServices(snap.data().services || []);
+        if (snap.exists() && Array.isArray(snap.data().services) && snap.data().services.length > 0) {
+          setServices(snap.data().services);
+        } else {
+          setServices(defaultServices);
         }
       } catch (error) {
         console.error("Error fetching services:", error);
+        setServices(defaultServices);
       } finally {
         setLoading(false);
       }

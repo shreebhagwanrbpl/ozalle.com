@@ -2,6 +2,8 @@ import { db } from "@/lib/firebase";
 import { collection, getDocs } from "firebase/firestore";
 import { fetchFullCatalog } from "@/lib/data-fetcher-server";
 
+export const revalidate = 86400; // Cache sitemap for 24 hours
+
 export default async function sitemap() {
     const baseUrl = "https://ozalle.com";
     const urls = [];

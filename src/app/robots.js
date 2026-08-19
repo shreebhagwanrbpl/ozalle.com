@@ -5,6 +5,6 @@ export default function robots() {
             allow: "/",
             disallow: ["/api/", "/*?*", "/_next/", "/private/"],
         },
-        sitemap: "https://ozallecom.com/sitemap.xml",
+        sitemap: "https://ozalle.com/sitemap.xml",
     };
 }

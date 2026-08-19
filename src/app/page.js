@@ -66,11 +66,40 @@ export default function HeroSection({ city }) {
           )
         );
 
-        if (snap.exists()) {
-          setServices(snap.data().services || []);
+        if (snap.exists() && Array.isArray(snap.data().services) && snap.data().services.length > 0) {
+          setServices(snap.data().services);
+        } else {
+          setServices([
+            {
+              title: "Diagnostic Equipment & Analyzers Supply",
+              desc: "Complete supply and distribution of CBC machines, 3-part & 5-part hematology analyzers, fully automated biochemistry analyzers, and ELISA readers across India.",
+            },
+            {
+              title: "Laboratory Setup & Installation",
+              desc: "Turnkey diagnostic laboratory planning, calibration, installation, and operational setup tailored for hospitals, pathology labs, and clinics.",
+            },
+            {
+              title: "Biomedical Maintenance & AMC Services",
+              desc: "Annual Maintenance Contracts (AMC), preventive maintenance, regular calibration, and rapid troubleshooting to ensure minimal downtime for critical analyzers.",
+            },
+          ]);
         }
       } catch (error) {
         console.error(error);
+        setServices([
+          {
+            title: "Diagnostic Equipment & Analyzers Supply",
+            desc: "Complete supply and distribution of CBC machines, 3-part & 5-part hematology analyzers, fully automated biochemistry analyzers, and ELISA readers across India.",
+          },
+          {
+            title: "Laboratory Setup & Installation",
+            desc: "Turnkey diagnostic laboratory planning, calibration, installation, and operational setup tailored for hospitals, pathology labs, and clinics.",
+          },
+          {
+            title: "Biomedical Maintenance & AMC Services",
+            desc: "Annual Maintenance Contracts (AMC), preventive maintenance, regular calibration, and rapid troubleshooting to ensure minimal downtime for critical analyzers.",
+          },
+        ]);
       }
     };
 
