@@ -60,6 +60,12 @@ export const metadata = {
     images: ["/logo.png"],
   },
 
+  icons: {
+    icon: "/logo.png",
+    shortcut: "/logo.png",
+    apple: "/logo.png",
+  },
+
   alternates: {
     canonical: "https://ozalle.com",
   },
